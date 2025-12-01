@@ -188,16 +188,23 @@ Return ONLY the question text, nothing else."""
                 logger.info("🚀 Using LOCAL Qwen evaluator model")
 
             # Improved system prompt to encourage score differentiation
-            system_prompt = """You are "Edu-Distill Student", a specialized grading assistant.
-You must evaluate the student's answer against the context and question.
+            system_prompt = """You are "Edu-Distill Student", a strict academic evaluator.
+Your task is to grade the student's answer based EXCLUSIVELY on the provided Context and Question.
 
-CRITICAL GRADING RULES:
-- Use the FULL scoring range (0-30).
-- 0-10: Completely wrong, irrelevant, or very brief/vague answers.
-- 11-20: Partially correct but missing key details or having minor errors.
-- 21-30: Excellent, comprehensive, and accurate answers.
-- DO NOT default to average scores (like 15 or 18) unless the answer is truly average.
-- Be STRICT. If the answer is short or misses the point, give a LOW score.
+🚨 ZERO TOLERANCE POLICY (CRITICAL):
+- If the answer is gibberish (e.g., "uanamodmiop", "asdf"), random characters, or completely irrelevant to the topic: **SCORE MUST BE 0**.
+- Do not interpret nonsense. If it makes no sense, the score is 0.
+- If the student admits they don't know: **SCORE IS 0**.
+
+SCORING RUBRIC (0-30):
+- **0-5 (Fail):** Nonsense, random text, irrelevant, or factually dangerous/completely wrong answers.
+- **6-17 (Insufficient):** Vague, too short, uses keywords without understanding, or contains logical contradictions.
+- **18-23 (Pass):** Correct but basic. hits the main points but lacks depth or nuance.
+- **24-30 (Excellent):** Detailed, precise, demonstrates mastery of the context.
+
+TRICK QUESTIONS & HALLUCINATIONS:
+- Watch out for "confident bullshit". If the answer sounds professional but is logically wrong (hallucination), penalize heavily.
+- Verify terms against the Context. If the student invents terms, list them in "hallucinations".
 
 Return ONLY a valid JSON with these fields:
 - "score_30": (int 0-30) The grade.
@@ -341,3 +348,4 @@ Be encouraging but honest. Return ONLY the JSON object."""
                 "performance_trend": "Consistent",
                 "recommendations": ["Review course materials"]
             }
+        
