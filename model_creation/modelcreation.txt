@@ -1,0 +1,388 @@
+# ==================== EDU-DISTILL PRO (A100 EDITION) ====================
+# Configurazione ottimizzata per Colab Pro con GPU A100 (40GB VRAM)
+
+print("Inizializzazione Ambiente PRO...")
+import subprocess
+import sys
+import gc
+import os
+import torch
+
+# Pulizia preventiva
+gc.collect()
+torch.cuda.empty_cache()
+
+# Installazione librerie
+commands = [
+    "pip install -q -U torch transformers datasets accelerate peft bitsandbytes"
+]
+for cmd in commands:
+    subprocess.check_call(cmd, shell=True)
+
+import torch.nn as nn
+import torch.nn.functional as F
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    TrainingArguments,
+    Trainer,
+    DataCollatorForLanguageModeling
+)
+from datasets import load_dataset
+from peft import LoraConfig, get_peft_model
+
+# Verifica Hardware
+gpu_name = torch.cuda.get_device_name(0)
+print(f"✅ GPU Attiva: {gpu_name}")
+if "A100" not in gpu_name and "L4" not in gpu_name:
+    print("⚠️ ATTENZIONE: Non stai usando una A100/L4. Se usi una T4, questo codice potrebbe crashare per memoria.")
+
+# ==================== 1. CONFIGURAZIONE PRO ====================
+TEACHER_ID = "Qwen/Qwen2.5-7B-Instruct"
+STUDENT_ID = "Qwen/Qwen2.5-1.5B-Instruct"
+OUTPUT_DIR = "./qwen_evaluator_pro"
+DATA_FILE = "dataset.json"
+
+# Parametri Potenziati
+MAX_SEQ_LENGTH = 2048   # 4x rispetto alla versione free!
+TEMPERATURE = 2.0
+ALPHA = 0.5
+
+# System Prompt Rigoroso
+SYSTEM_PROMPT = """You are "Edu-Distill Student", a specialized model obtained via Knowledge Distillation for automated grading.
+
+Input:
+- Context: The reference material
+- Question: The exam question
+- Student Answer: The student's response
+
+Return ONLY a raw JSON object (no markdown, no ```json tags).
+Structure:
+- "score_30": (int 0-30) Estimated grade.
+- "key_coverage": (int 0-100) Percentage of key concepts covered.
+- "missing_concepts": (list[str]) Key concepts missing from the answer.
+- "hallucinations": (list[str]) False statements found.
+- "bias_check": (bool) True if language is inappropriate.
+- "feedback": (str) Brief technical feedback."""
+
+# ==================== 2. DATASET & TOKENIZER ====================
+print(f"📥 Caricamento Dataset da {DATA_FILE}...")
+if not os.path.exists(DATA_FILE):
+    raise FileNotFoundError("❌ ERRORE: Carica 'dataset.json' nei file a sinistra!")
+
+dataset = load_dataset("json", data_files=DATA_FILE, split="train")
+print(f"✅ Trovati {len(dataset)} esempi.")
+
+tokenizer = AutoTokenizer.from_pretrained(TEACHER_ID)
+tokenizer.pad_token = tokenizer.eos_token
+tokenizer.model_max_length = MAX_SEQ_LENGTH
+
+def format_and_tokenize(examples):
+    prompts = []
+    for context, question, answer, target in zip(
+        examples['context'], examples['question'], examples['student_answer'], examples['target_json']
+    ):
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Context: {context}\n\nQuestion: {question}\n\nStudent Answer: {answer}"}
+        ]
+        # Generiamo il prompt
+        text_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        # Uniamo prompt + target JSON
+        full_text = text_prompt + target + tokenizer.eos_token
+        prompts.append(full_text)
+
+    return tokenizer(
+        prompts,
+        max_length=MAX_SEQ_LENGTH,
+        truncation=True,
+        padding="max_length"
+    )
+
+print("🔄 Tokenizzazione (High-Res)...")
+tokenized_dataset = dataset.map(format_and_tokenize, batched=True, remove_columns=dataset.column_names)
+
+# ==================== 3. CARICAMENTO MODELLI (FULL PRECISION) ====================
+print("👨‍🏫 Caricamento TEACHER (16-bit Originale)...")
+# Qui sta la differenza: NIENTE 4-bit. Usiamo bfloat16 per massima qualità.
+teacher_model = AutoModelForCausalLM.from_pretrained(
+    TEACHER_ID,
+    torch_dtype=torch.bfloat16, # Formato nativo A100
+    device_map="auto",
+    attn_implementation="sdpa"
+)
+teacher_model.eval()
+for param in teacher_model.parameters():
+    param.requires_grad = False
+
+print("👨‍🎓 Caricamento STUDENT (1.5B)...")
+student_model = AutoModelForCausalLM.from_pretrained(
+    STUDENT_ID,
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+    attn_implementation="sdpa"
+)
+
+# Gradient Checkpointing (Opzionale su A100, ma lo teniamo per sicurezza se il batch è alto)
+student_model.gradient_checkpointing_enable()
+
+# LoRA Configurazione "Muscolosa"
+peft_config = LoraConfig(
+    r=64,             # Rank 64 (4x rispetto a prima) -> Più capacità di apprendimento
+    lora_alpha=128,   # Alpha scalato
+    target_modules="all-linear", # Colpisce TUTTI i layer lineari, non solo q_proj/v_proj
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM"
+)
+student_model = get_peft_model(student_model, peft_config)
+student_model.enable_input_require_grads()
+student_model.print_trainable_parameters()
+
+# ==================== 4. CUSTOM TRAINER ====================
+class LogitsDistillationTrainer(Trainer):
+    def __init__(self, teacher_model=None, temperature=2.0, alpha=0.5, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.teacher_model = teacher_model
+        self.temperature = temperature
+        self.alpha = alpha
+        self.kl_loss = nn.KLDivLoss(reduction="batchmean")
+
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        outputs_student = model(**inputs)
+        student_logits = outputs_student.logits
+
+        with torch.no_grad():
+            outputs_teacher = self.teacher_model(**inputs)
+            teacher_logits = outputs_teacher.logits
+
+        # Resize Vocab (Sicurezza)
+        min_vocab = min(student_logits.size(-1), teacher_logits.size(-1))
+        student_logits = student_logits[..., :min_vocab]
+        teacher_logits = teacher_logits[..., :min_vocab]
+
+        # Loss KL
+        student_probs = F.log_softmax(student_logits / self.temperature, dim=-1)
+        teacher_probs = F.softmax(teacher_logits / self.temperature, dim=-1)
+
+        distillation_loss = self.kl_loss(student_probs, teacher_probs) * (self.temperature ** 2)
+        student_loss = outputs_student.loss
+
+        loss = (self.alpha * distillation_loss) + ((1 - self.alpha) * student_loss)
+        return (loss, outputs_student) if return_outputs else loss
+
+# ==================== 5. TRAINING ARGS (A100 TUNED) ====================
+training_args = TrainingArguments(
+    output_dir=OUTPUT_DIR,
+    per_device_train_batch_size=1,  # Possiamo osare di più su A100
+    gradient_accumulation_steps=8,
+    num_train_epochs=3,
+    learning_rate=2e-4,
+    bf16=True,                      # Brain Float 16 (Fondamentale su A100)
+    logging_steps=5,
+    save_strategy="no",
+    report_to="none",
+    optim="adamw_torch"
+)
+
+trainer = LogitsDistillationTrainer(
+    teacher_model=teacher_model,
+    temperature=TEMPERATURE,
+    alpha=ALPHA,
+    model=student_model,
+    args=training_args,
+    train_dataset=tokenized_dataset,
+    data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
+)
+
+print("\n🚀 AVVIO TRAINING DISTILLATION PRO...")
+trainer.train()
+
+# ==================== 6. SALVATAGGIO ====================
+print(f"✅ Training Pro Completato! Salvataggio in {OUTPUT_DIR}")
+student_model.save_pretrained(OUTPUT_DIR)
+tokenizer.save_pretrained(OUTPUT_DIR)
+
+print("📦 Creazione ZIP...")
+os.system(f"cd {OUTPUT_DIR} && zip -r ../qwen_evaluator_pro.zip .")
+print("⬇️  Scarica 'qwen_evaluator_pro.zip' dalla barra laterale!")
+
+# ==================== TEST "CLEAN LOAD" (PRO EDITION) ====================
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
+
+# 1. Configurazione Percorsi
+BASE_MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
+ADAPTER_PATH = "./qwen_evaluator_pro" # La cartella creata dal training
+
+print("📦 Caricamento Tokenizer...")
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_ID)
+
+print("📦 Caricamento Modello Base (bfloat16)...")
+# Carichiamo il base in formato nativo A100
+base_model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL_ID,
+    torch_dtype=torch.bfloat16,
+    device_map="auto"
+)
+
+print("🔗 Applicazione LoRA PRO...")
+model = PeftModel.from_pretrained(base_model, ADAPTER_PATH)
+model.eval() # <--- IMPORTANTE: Mette il modello in modalità "Esame", non "Studio"
+
+# 2. Il Test "Tricky" (Overfitting)
+TEST_CONTEXT = "Overfitting occurs when a machine learning model learns the training data too well, capturing noise and outliers instead of the underlying pattern. This leads to poor performance on new, unseen data. Common solutions include regularization (L1/L2), dropout, and early stopping."
+TEST_QUESTION = "What is overfitting and how can you prevent it?"
+TEST_ANSWER = "Overfitting is when the model performs great on training data. You can fix it by training for more epochs."
+
+# 3. Prompt Completo
+SYSTEM_PROMPT = """You are "Edu-Distill Student", a specialized model obtained via Knowledge Distillation for automated grading.
+
+Input:
+- Context: The reference material
+- Question: The exam question
+- Student Answer: The student's response
+
+Return ONLY a raw JSON object (no markdown).
+Structure:
+- "score_30": (int 0-30) Estimated grade.
+- "key_coverage": (int 0-100) Percentage of key concepts covered.
+- "missing_concepts": (list[str]) Key concepts missing from the answer.
+- "hallucinations": (list[str]) False statements found.
+- "bias_check": (bool) True if language is inappropriate.
+- "feedback": (str) Brief technical feedback."""
+
+# 4. Preparazione Input (Blindata)
+messages = [
+    {"role": "system", "content": SYSTEM_PROMPT},
+    {"role": "user", "content": f"Context: {TEST_CONTEXT}\n\nQuestion: {TEST_QUESTION}\n\nStudent Answer: {TEST_ANSWER}"}
+]
+
+inputs = tokenizer.apply_chat_template(
+    messages,
+    tokenize=True,
+    add_generation_prompt=True,
+    return_tensors="pt",
+    return_dict=True
+).to("cuda")
+
+print("🧐 Il Giudice PRO sta analizzando (Tentativo Pulito)...")
+
+# 5. Generazione
+with torch.no_grad():
+    outputs = model.generate(
+        input_ids=inputs.input_ids,
+        attention_mask=inputs.attention_mask,
+        max_new_tokens=400,
+        temperature=0.1,
+        repetition_penalty=1.1,
+        do_sample=True,
+        pad_token_id=tokenizer.eos_token_id
+    )
+
+# 6. Risultato
+response = tokenizer.decode(outputs[0], skip_special_tokens=True).split("assistant")[-1].strip()
+
+print("\n=== VERDETTO ===")
+print(response)
+
+
+# ==================== MERGE & EXPORT (FUSIONE FINALE) ====================
+import torch
+from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import os
+
+# 1. Setup Percorsi
+BASE_MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
+ADAPTER_PATH = "./qwen_evaluator_pro"
+FINAL_OUTPUT_DIR = "./qwen_evaluator_MERGED_FP16"
+
+print("🏗️ Inizio processo di fusione (Merge)...")
+
+# 2. Carica Base (CPU per risparmiare VRAM durante il salvataggio)
+print("📦 Caricamento Base Model...")
+base_model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL_ID,
+    torch_dtype=torch.float16, # Usiamo float16 standard per massima compatibilità
+    device_map="auto"
+)
+
+# 3. Carica e Fondi LoRA
+print("🔗 Fusione LoRA...")
+model = PeftModel.from_pretrained(base_model, ADAPTER_PATH)
+merged_model = model.merge_and_unload() # <--- LA MAGIA: Diventa un modello unico
+
+# 4. Salva il modello completo
+print(f"💾 Salvataggio modello completo in {FINAL_OUTPUT_DIR}...")
+merged_model.save_pretrained(FINAL_OUTPUT_DIR)
+
+# 5. Salva il Tokenizer (Fondamentale portarselo dietro)
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_ID)
+tokenizer.save_pretrained(FINAL_OUTPUT_DIR)
+
+print("✅ Fatto! Ora comprimiamo tutto...")
+
+# 6. Crea ZIP
+os.system(f"cd {FINAL_OUTPUT_DIR} && zip -r ../qwen_evaluator_FULL.zip .")
+
+print(f"⬇️  IL TUO MODELLO È PRONTO: Scarica 'qwen_evaluator_FULL.zip' dalla barra a sinistra.")
+
+# ==================== CELLA 5 (FIX CMake): CONVERSIONE GGUF ====================
+from google.colab import drive
+import os
+
+print("📂 Verifica Montaggio Drive...")
+if not os.path.exists('/content/drive'):
+    drive.mount('/content/drive')
+
+# 1. PULIZIA TOTALE (Rimuoviamo la vecchia installazione fallita)
+print("🧹 Rimozione vecchia cartella llama.cpp...")
+!rm -rf llama.cpp
+
+# 2. Scaricamento e COMPILAZIONE CON CMAKE (Nuovo Metodo)
+print("🛠️ Scaricamento e Compilazione Llama.cpp (Attendere qualche minuto)...")
+!git clone https://github.com/ggerganov/llama.cpp
+!pip install -r llama.cpp/requirements.txt
+
+# --- NUOVO PROCESSO DI BUILD ---
+print("⚙️ Compilazione in corso (questo passaggio richiede 2-3 minuti)...")
+!mkdir -p llama.cpp/build
+!cd llama.cpp/build && cmake .. && cmake --build . --config Release
+# -------------------------------
+
+# 3. Definiamo i percorsi
+INPUT_MODEL_PATH = "./qwen_evaluator_MERGED_FP16"
+OUTPUT_GGUF_PATH = "/content/drive/MyDrive/qwen_evaluator_q4_k_m.gguf"
+TEMP_FP16 = "/content/temp_fp16.gguf"
+
+# 4. Conversione in GGUF (Formato Grezzo FP16)
+if not os.path.exists(TEMP_FP16):
+    print("🔄 Conversione in GGUF (FP16)...")
+    !python llama.cpp/convert_hf_to_gguf.py {INPUT_MODEL_PATH} --outfile {TEMP_FP16}
+else:
+    print("⏩ File GGUF intermedio già presente.")
+
+# 5. Quantizzazione a 4-bit
+print("🔨 Quantizzazione a 4-bit (q4_k_m)...")
+
+# Col nuovo sistema, il file eseguibile finisce in una cartella diversa (bin)
+BINARY_PATH = "llama.cpp/build/bin/llama-quantize"
+
+if not os.path.exists(BINARY_PATH):
+    # Tentativo di fallback se il percorso cambia
+    if os.path.exists("llama.cpp/build/llama-quantize"):
+        BINARY_PATH = "llama.cpp/build/llama-quantize"
+    else:
+        raise FileNotFoundError(f"❌ ERRORE: Non trovo il file '{BINARY_PATH}'. La compilazione CMake è fallita.")
+
+!{BINARY_PATH} {TEMP_FP16} {OUTPUT_GGUF_PATH} q4_k_m
+
+# 6. Pulizia Finale
+if os.path.exists(TEMP_FP16):
+    !rm {TEMP_FP16}
+
+print(f"\n✅ MISSIONE COMPIUTA!")
+print(f"🎉 Il file finale è pronto: {OUTPUT_GGUF_PATH}")
+print(f"👉 Controlla su Drive. Deve pesare circa 1 GB.")

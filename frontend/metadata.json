@@ -1,0 +1,7 @@
+{
+  "name": "Edu-Distill",
+  "description": "AI-powered automated grading platform leveraging Knowledge Distillation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
