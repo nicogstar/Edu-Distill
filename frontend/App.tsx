@@ -658,12 +658,25 @@ const App: React.FC = () => {
               Qualitative Analysis
             </h1>
             <p className="text-xl text-slate-300 mb-8">
-              Here is a real example. The question was about 'Overfitting' in machine learning.
+              Here is a real example from our testing.
             </p>
-            <div className="glass-panel p-8 rounded-3xl text-left">
-              <div className="mb-6">
+            <div className="glass-panel p-8 rounded-3xl text-left space-y-6">
+              {/* The Question */}
+              <div>
+                <h3 className="text-white font-bold mb-2">The Question</h3>
+                <p className="text-white">"What is overfitting and how can you prevent it?"</p>
+              </div>
+
+              {/* Student Answer */}
+              <div className="border-l-4 border-yellow-500 pl-6">
+                <h3 className="text-yellow-400 font-bold mb-2">The Student Answer (The Common Misconception)</h3>
+                <p className="text-slate-300 italic">"Overfitting is when the model performs great on training data. You can fix it by training for more epochs."</p>
+              </div>
+
+              {/* The Scenario */}
+              <div>
                 <h3 className="text-white font-bold mb-2">The Scenario</h3>
-                <p className="text-slate-400">The student gave a common misconception. A generic model might have let it slide.</p>
+                <p className="text-white">The student gave a common misconception. A generic model might have let it slide.</p>
               </div>
               <div className="border-l-4 border-rose-500 pl-6">
                 <h3 className="text-rose-400 font-bold mb-2">Edu-Distill Verdict</h3>
