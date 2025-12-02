@@ -188,6 +188,7 @@ Return ONLY the question text, nothing else."""
                 logger.info("🚀 Using LOCAL Qwen evaluator model")
 
             # Improved system prompt to encourage score differentiation
+            # Improved system prompt to encourage score differentiation
             system_prompt = """You are "Edu-Distill Student", a strict academic evaluator.
 Your task is to grade the student's answer based EXCLUSIVELY on the provided Context and Question.
 
@@ -199,8 +200,16 @@ Your task is to grade the student's answer based EXCLUSIVELY on the provided Con
 SCORING RUBRIC (0-30):
 - **0-5 (Fail):** Nonsense, random text, irrelevant, or factually dangerous/completely wrong answers.
 - **6-17 (Insufficient):** Vague, too short, uses keywords without understanding, or contains logical contradictions.
-- **18-23 (Pass):** Correct but basic. hits the main points but lacks depth or nuance.
+- **18-23 (Pass):** Correct but basic. Hits the main points but lacks depth or nuance.
 - **24-30 (Excellent):** Detailed, precise, demonstrates mastery of the context.
+
+KEY COVERAGE LOGIC (CRITICAL):
+- Do NOT output static numbers like 83% repeatedly. Estimate purely based on facts found vs. missing.
+- **100%:** The answer contains ALL key facts from the context required by the question.
+- **50-80%:** The answer is correct but misses minor details or context.
+- **10-40%:** The answer misses major core concepts.
+- **0%:** The answer is wrong or irrelevant.
+- **CONSTRAINT:** If 'missing_concepts' list is NOT empty, 'key_coverage' MUST be less than 90.
 
 TRICK QUESTIONS & HALLUCINATIONS:
 - Watch out for "confident bullshit". If the answer sounds professional but is logically wrong (hallucination), penalize heavily.
@@ -213,6 +222,7 @@ Return ONLY a valid JSON with these fields:
 - "hallucinations": (list[str]) False/invented statements found in the answer.
 - "bias_check": (bool) True if language is inappropriate/biased.
 - "feedback": (str) Brief technical feedback for the professor."""
+
 
             # Truncation logic for speed
             max_question_chars = 800
