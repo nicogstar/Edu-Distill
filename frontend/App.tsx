@@ -140,7 +140,59 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide 4: Theoretical Background */}
+        {/* Slide 4: Related Works & Competitors */}
+        <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
+          <div className="max-w-5xl px-6 text-center">
+            <div className="inline-block border border-cyan-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+              <h2 className="text-sm font-bold text-cyan-400 uppercase tracking-[0.3em]">Related Works</h2>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 header-font drop-shadow-lg">
+              Related Works & Competitors
+            </h1>
+            <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              How does Edu-Distill compare to existing solutions?
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-6 mt-8">
+              <div className="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform duration-300">
+                <div className="text-4xl mb-4">☁️</div>
+                <h3 className="text-lg font-bold text-white mb-3">Cloud APIs (GPT-4)</h3>
+                <div className="text-left space-y-2">
+                  <p className="text-sm text-emerald-400">✓ Good Performance</p>
+                  <p className="text-sm text-rose-400">✗ High Cost</p>
+                  <p className="text-sm text-rose-400">✗ Privacy Risks</p>
+                </div>
+              </div>
+              <div className="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform duration-300">
+                <div className="text-4xl mb-4">🖥️</div>
+                <h3 className="text-lg font-bold text-white mb-3">Standard Local LLMs (Llama-3 8B)</h3>
+                <div className="text-left space-y-2">
+                  <p className="text-sm text-emerald-400">✓ Private</p>
+                  <p className="text-sm text-rose-400">✗ Heavy Hardware</p>
+                  <p className="text-sm text-slate-400 text-xs">(8GB+ VRAM)</p>
+                </div>
+              </div>
+              <div className="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform duration-300">
+                <div className="text-4xl mb-4">🔤</div>
+                <h3 className="text-lg font-bold text-white mb-3">Keyword Matchers (Regex)</h3>
+                <div className="text-left space-y-2">
+                  <p className="text-sm text-emerald-400">✓ Fast & Cheap</p>
+                  <p className="text-sm text-rose-400">✗ "Dumb"</p>
+                  <p className="text-sm text-slate-400 text-xs">(No reasoning)</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 glass-panel p-6 rounded-2xl border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+              <p className="text-lg text-white font-semibold">
+                <span className="text-cyan-400">Edu-Distill</span> fills the gap: <span className="text-emerald-400">Private</span>, <span className="text-purple-400">Lightweight</span>, and <span className="text-orange-400">Intelligent</span>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+
+        {/* Slide 5: Theoretical Background */}
         <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
           <div className="max-w-4xl px-6 text-center">
             <div className="inline-block border border-emerald-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
@@ -166,7 +218,104 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide 5: Model Architecture */}
+        {/* Slide 6: Training Process Timeline */}
+        <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
+          <div className="max-w-6xl px-6 text-center">
+            <div className="inline-block border border-amber-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+              <h2 className="text-sm font-bold text-amber-400 uppercase tracking-[0.3em]">The Pipeline</h2>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 header-font drop-shadow-lg">
+              Training Process Timeline
+            </h1>
+            <p className="text-xl text-slate-300 mb-10">
+              From raw data to deployment-ready model in 5 stages.
+            </p>
+
+            {/* Timeline */}
+            <div className="relative">
+              {/* Connection Line */}
+              <div className="absolute top-8 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/20 via-amber-500/50 to-amber-500/20 hidden md:block"></div>
+
+              <div className="grid md:grid-cols-5 gap-4 relative">
+                {/* Stage 1 */}
+                <div className="glass-panel p-4 rounded-2xl border-amber-500/30 hover:border-amber-500/60 transition-all">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-amber-500/20 border-2 border-amber-500 flex items-center justify-center text-amber-400 font-bold">1</div>
+                  <h3 className="text-sm font-bold text-white mb-2">Data Generation</h3>
+                  <p className="text-xs text-slate-400 mb-2">GPT-4o creates 500+ examples</p>
+                </div>
+
+                {/* Stage 2 */}
+                <div className="glass-panel p-4 rounded-2xl border-orange-500/30 hover:border-orange-500/60 transition-all">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-orange-500/20 border-2 border-orange-500 flex items-center justify-center text-orange-400 font-bold">2</div>
+                  <h3 className="text-sm font-bold text-white mb-2">Teacher Training</h3>
+                  <p className="text-xs text-slate-400 mb-2">Qwen2.5 7B fine-tuning</p>
+                </div>
+
+                {/* Stage 3 */}
+                <div className="glass-panel p-4 rounded-2xl border-red-500/30 hover:border-red-500/60 transition-all">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center text-red-400 font-bold">3</div>
+                  <h3 className="text-sm font-bold text-white mb-2">Distillation</h3>
+                  <p className="text-xs text-slate-400 mb-2">Transfer to 1.5B Student</p>
+                </div>
+
+                {/* Stage 4 */}
+                <div className="glass-panel p-4 rounded-2xl border-purple-500/30 hover:border-purple-500/60 transition-all">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center text-purple-400 font-bold">4</div>
+                  <h3 className="text-sm font-bold text-white mb-2">Quantization</h3>
+                  <p className="text-xs text-slate-400 mb-2">16-bit → 4-bit GGUF</p>
+                </div>
+
+                {/* Stage 5 */}
+                <div className="glass-panel p-4 rounded-2xl border-cyan-500/30 hover:border-cyan-500/60 transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-cyan-500/20 border-2 border-cyan-500 flex items-center justify-center text-cyan-400 font-bold">5</div>
+                  <h3 className="text-sm font-bold text-white mb-2">Deployment</h3>
+                  <p className="text-xs text-slate-400 mb-2">Ready for laptops!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 7: Data Engineering */}
+        <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
+          <div className="max-w-4xl px-6 text-center">
+            <div className="inline-block border border-indigo-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+              <h2 className="text-sm font-bold text-indigo-400 uppercase tracking-[0.3em]">The Engineering Engine</h2>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 header-font drop-shadow-lg">
+              Data Engineering
+            </h1>
+            <p className="text-xl text-slate-300 mb-8">
+              Let's look under the hood. To make a good grader, you need a strict dataset.
+            </p>
+            <div className="glass-panel p-8 rounded-3xl text-left">
+              <div className="mb-6 pb-6 border-b border-white/10">
+                <h3 className="text-lg font-bold text-indigo-400 mb-3">Synthetic Data Generation via GPT-4o</h3>
+                <p className="text-slate-300">We leveraged GPT-4o to create a high-quality training dataset with over 500 carefully crafted examples.</p>
+              </div>
+              <ul className="space-y-4 text-slate-400">
+                <li className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">1.</span>
+                  <span>We generated <strong>'Tricky' examples</strong> containing deliberate hallucinations and logic traps to train the student to be a strict, zero-tolerance grader.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">2.</span>
+                  <span>We intentionally included <strong>fake scientific terms and misleading statements</strong> to test the model's ability to detect subtle errors.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">3.</span>
+                  <span>This ensures our student model doesn't just guess, but actually <strong>detects errors with precision</strong>.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">4.</span>
+                  <span>We forced the model to output a strict <strong>JSON format</strong> for structured, parseable feedback.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 8: Model Architecture */}
         <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
           <div className="max-w-6xl px-6">
             <div className="text-center mb-12">
@@ -205,7 +354,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide 6: Distillation Strategy */}
+        {/* Slide 9: Distillation Strategy */}
         <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
           <div className="max-w-4xl px-6 text-center">
             <div className="inline-block border border-pink-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(236,72,153,0.2)]">
@@ -228,42 +377,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide 7: Data Engineering */}
-        <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
-          <div className="max-w-4xl px-6 text-center">
-            <div className="inline-block border border-indigo-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-              <h2 className="text-sm font-bold text-indigo-400 uppercase tracking-[0.3em]">The Engineering Engine</h2>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 header-font drop-shadow-lg">
-              Data Engineering
-            </h1>
-            <p className="text-xl text-slate-300 mb-8">
-              Let's look under the hood. To make a good grader, you need a strict dataset.
-            </p>
-            <div className="glass-panel p-8 rounded-3xl text-left">
-              <ul className="space-y-4 text-slate-400">
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 mt-1">1.</span>
-                  <span>We used <strong> GPT-4o </strong> to generate over 500 'Tricky' examples.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 mt-1">2.</span>
-                  <span>We intentionally included <strong>logic traps and hallucinations</strong>—like fake scientific terms.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 mt-1">3.</span>
-                  <span>This ensures our student model doesn't just guess, but actually <strong>detects errors</strong>.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-indigo-400 mt-1">4.</span>
-                  <span>We forced the model to output a strict <strong>JSON format</strong>.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Slide 8: Infrastructure */}
+        {/* Slide 10: Infrastructure */}
         <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
           <div className="max-w-4xl px-6 text-center">
             <div className="inline-block border border-blue-600/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(37,99,235,0.2)]">
@@ -286,7 +400,7 @@ const App: React.FC = () => {
               </div>
               <div className="glass-panel p-6 rounded-2xl col-span-2">
                 <h3 className="text-lg font-bold text-white mb-2">Bfloat16 Precision</h3>
-                <p className="text-slate-400 text-sm">This specific numerical format was necessary to keep our calculations stable during the complex distillation process.</p>
+                <p className="text-slate-400 text-sm">We loaded the Teacher model in its native High Definition format (uncompressed). This ensures the Student learns from pure, high-fidelity logits, avoiding the 'noise' caused by 4-bit quantization.</p>
               </div>
             </div>
           </div>
@@ -294,22 +408,49 @@ const App: React.FC = () => {
 
         {/* Slide 9: The Mathematics */}
         <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
-          <div className="max-w-4xl px-6 text-center">
-            <div className="inline-block border border-violet-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(139,92,246,0.2)]">
+          <div className="max-w-6xl px-6 text-center">
+            <div className="inline-block border border-violet-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-4 shadow-[0_0_15px_rgba(139,92,246,0.2)]">
               <h2 className="text-sm font-bold text-violet-400 uppercase tracking-[0.3em]">Mathematics</h2>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-500 header-font drop-shadow-lg">
-              Custom Loss Function
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-500 header-font drop-shadow-lg">
+              The Distillation Formula
             </h1>
-            <p className="text-xl text-slate-300 mb-8">
-              This is the mathematical heart of our project.
+            <p className="text-lg text-slate-300 mb-4">
+              This is the mathematical heart of our project: the Hybrid Loss Function.
             </p>
-            <div className="glass-panel p-8 rounded-3xl">
-              <p className="text-lg text-white mb-4">
-                We combined standard error and <span className="text-violet-400 font-bold">Kullback-Leibler Divergence</span>.
+
+            {/* Formula Display */}
+            <div className="glass-panel p-4 rounded-2xl mb-4 border-violet-500/30">
+              <p className="text-xl md:text-2xl font-mono text-white">
+                Total Loss = (α × KL<sub className="text-sm">Divergence</sub>) + ((1 - α) × Cross<sub className="text-sm">Entropy</sub>)
               </p>
-              <p className="text-slate-400 leading-relaxed">
-                Essentially, we used a <span className="text-white font-mono">'Temperature'</span> parameter to soften the data. This forces the Student model to look at the Teacher's <span className="text-white italic">'hidden thoughts'</span>—the reasoning behind the answer—not just the answer itself.
+            </div>
+
+            {/* Two Column Explanation */}
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className="glass-panel p-4 rounded-2xl text-left border-purple-500/30">
+                <h3 className="text-lg font-bold text-purple-400 mb-2">KL Divergence - The "Magic"</h3>
+                <ul className="space-y-1 text-slate-300 text-xs">
+                  <li>• Measures how the <span className="text-white font-semibold">Student (1.5B)</span> mimics the <span className="text-white font-semibold">Teacher's (7B)</span> probability distribution</li>
+                  <li>• Uses <span className="text-purple-400 font-mono">Temperature (T=2.0)</span> to soften targets</li>
+                  <li>• Teaches <span className="text-purple-400 font-semibold">nuance</span>: e.g., 'Feline' is close to 'Cat', 'Table' is wrong</li>
+                </ul>
+              </div>
+
+              <div className="glass-panel p-4 rounded-2xl text-left border-cyan-500/30">
+                <h3 className="text-lg font-bold text-cyan-400 mb-2">Cross-Entropy - The "Truth"</h3>
+                <ul className="space-y-1 text-slate-300 text-xs">
+                  <li>• Compares the student's answer to the <span className="text-white font-semibold">hard ground truth</span> in the dataset</li>
+                  <li>• Ensures the model stays <span className="text-cyan-400 font-semibold">grounded and accurate</span> to the reference material</li>
+                  <li>• Prevents the model from drifting away from correct answers</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="glass-panel p-4 rounded-2xl border-fuchsia-500/30">
+              <p className="text-base text-white">
+                With <span className="text-fuchsia-400 font-bold">Alpha = 0.5</span>, the model serves two masters: <span className="text-purple-400">50% imitating the Teacher's reasoning</span>, <span className="text-cyan-400">50% adhering to the Dataset's truth</span>.
               </p>
             </div>
           </div>
@@ -467,18 +608,24 @@ const App: React.FC = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
               <div className="glass-panel p-8 rounded-2xl relative overflow-hidden">
-                <div className="text-6xl font-bold text-emerald-400 mb-2">92%</div>
+                <div className="text-6xl font-bold text-emerald-400 mb-2">80%</div>
                 <h3 className="text-xl font-bold text-white mb-2">Fidelity</h3>
-                <p className="text-sm text-slate-400">
-                  The Student agrees with the Teacher's grade 92% of the time.
+                <p className="text-sm text-slate-400 mb-2">
+                  Agreement rate with Teacher's Rubric
+                </p>
+                <p className="text-xs text-slate-500">
+                  The Student agrees with the Teacher's grade 80% of the time.
                 </p>
               </div>
 
               <div className="glass-panel p-8 rounded-2xl relative overflow-hidden">
-                <div className="text-6xl font-bold text-cyan-400 mb-2">15x</div>
+                <div className="text-6xl font-bold text-cyan-400 mb-2">4x</div>
                 <h3 className="text-xl font-bold text-white mb-2">Speedup</h3>
-                <p className="text-sm text-slate-400">
-                  Faster inference on CPU compared to running a larger model.
+                <p className="text-sm text-slate-400 mb-2">
+                  CPU Inference Latency vs Cloud API
+                </p>
+                <p className="text-xs text-slate-500">
+                  Faster inference on CPU compared to cloud-based models.
                 </p>
               </div>
 
@@ -489,6 +636,14 @@ const App: React.FC = () => {
                   Significant reduction in storage requirements.
                 </p>
               </div>
+            </div>
+
+            {/* Qualitative Note */}
+            <div className="mt-10 glass-panel p-6 rounded-2xl border-orange-500/30">
+              <h3 className="text-lg font-bold text-orange-400 mb-2">Qualitative Insight</h3>
+              <p className="text-slate-300">
+                The model successfully <span className="text-white font-semibold">detects confident hallucinations</span> and provides strict, accurate grading.
+              </p>
             </div>
           </div>
         </div>
@@ -543,6 +698,89 @@ const App: React.FC = () => {
               <div className="glass-panel p-6 rounded-2xl flex items-start gap-4">
                 <span className="text-slate-500 font-bold text-xl">3.</span>
                 <p className="text-slate-300">Converting to 4-bit does lose a tiny amount of linguistic quality.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 18: Future Works */}
+        <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
+          <div className="max-w-5xl px-6 text-center">
+            <div className="inline-block border border-emerald-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+              <h2 className="text-sm font-bold text-emerald-400 uppercase tracking-[0.3em]">The Road Ahead</h2>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500 header-font drop-shadow-lg">
+              Future Works
+            </h1>
+            <p className="text-xl text-slate-300 mb-10">
+              We have ambitious plans to expand Edu-Distill's capabilities.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Left Column */}
+              <div className="space-y-4">
+                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">🖼️</div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-2">Multimodal Support</h3>
+                      <p className="text-sm text-slate-400">Enable grading of diagrams, charts, and handwritten work using vision models.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">📚</div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-2">Larger Context Windows</h3>
+                      <p className="text-sm text-slate-400">Expand from 4K to 32K tokens to handle entire textbooks and research papers.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">🌍</div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-2">Multi-Language Support</h3>
+                      <p className="text-sm text-slate-400">Extend beyond English to support Spanish, French, German, and more.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-4">
+                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">🔌</div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-2">LMS Integration</h3>
+                      <p className="text-sm text-slate-400">Build plugins for Moodle, Canvas, and Blackboard for seamless adoption.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">🎯</div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-2">Domain Specialization</h3>
+                      <p className="text-sm text-slate-400">Create specialized models for STEM, humanities, and professional certifications.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">⚡</div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-2">Edge Deployment</h3>
+                      <p className="text-sm text-slate-400">Optimize for mobile devices and Raspberry Pi for maximum accessibility.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
