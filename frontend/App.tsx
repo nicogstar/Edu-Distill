@@ -84,7 +84,7 @@ const App: React.FC = () => {
                 <div className="text-4xl mb-4">💰</div>
                 <h3 className="text-lg font-bold text-white mb-3">Cost</h3>
                 <p className="text-sm text-slate-400 leading-relaxed">
-                  Running massive 70-billion parameter models for every student answer is too expensive.
+                  Running massive models for every student answer is too expensive.
                 </p>
               </div>
               <div className="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform duration-300">
@@ -159,6 +159,9 @@ const App: React.FC = () => {
               <p className="text-slate-400">
                 The idea is that a small, specialized model can outperform a giant generalist model if it is trained specifically for one task—in our case, <span className="text-emerald-400">academic grading</span>.
               </p>
+              <p className="text-slate-400 mt-4 border-t border-white/10 pt-4">
+                <span className="text-emerald-400 font-bold">Concept:</span> Transferring "Dark Knowledge" (reasoning patterns) via soft targets.
+              </p>
             </div>
           </div>
         </div>
@@ -185,7 +188,7 @@ const App: React.FC = () => {
 
               <div className="glass-panel p-8 rounded-3xl border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
                 <h3 className="text-2xl font-bold text-orange-400 mb-2">Teacher Model</h3>
-                <p className="text-xl text-white font-mono mb-6">Qwen 7B</p>
+                <p className="text-xl text-white font-mono mb-6">Qwen2.5 7B parameters</p>
                 <p className="text-slate-400 text-sm mb-4">
                   It is smart but requires expensive hardware (A100 GPUs).
                 </p>
@@ -193,7 +196,7 @@ const App: React.FC = () => {
 
               <div className="glass-panel p-8 rounded-3xl border-red-500/20 hover:border-red-500/40 transition-all duration-300">
                 <h3 className="text-2xl font-bold text-red-400 mb-2">Student Model</h3>
-                <p className="text-xl text-white font-mono mb-6">Qwen 1.5B</p>
+                <p className="text-xl text-white font-mono mb-6">Qwen2.5 1.5B parameters</p>
                 <p className="text-slate-400 text-sm mb-4">
                   It is lightweight and runs on a normal CPU. Our goal was to compress the Teacher's intelligence into the Student's efficiency.
                 </p>
@@ -241,7 +244,7 @@ const App: React.FC = () => {
               <ul className="space-y-4 text-slate-400">
                 <li className="flex items-start gap-3">
                   <span className="text-indigo-400 mt-1">1.</span>
-                  <span>We used <strong>Gemini 2.5 Flash</strong> to generate over 500 'Tricky' examples.</span>
+                  <span>We used <strong> GPT-4o </strong> to generate over 500 'Tricky' examples.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-indigo-400 mt-1">2.</span>
@@ -545,29 +548,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide 18: Future Roadmap */}
-        <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
-          <div className="max-w-4xl px-6 text-center">
-            <div className="inline-block border border-indigo-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-              <h2 className="text-sm font-bold text-indigo-400 uppercase tracking-[0.3em]">Future</h2>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 header-font drop-shadow-lg">
-              Roadmap: WebAssembly
-            </h1>
-            <p className="text-xl text-slate-300 mb-8">
-              Where do we go next? We want to eliminate Python.
-            </p>
-            <div className="glass-panel p-8 rounded-3xl">
-              <div className="text-6xl mb-6">🌐</div>
-              <h3 className="text-2xl font-bold text-white mb-4">In-Browser Execution</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Our goal is WebAssembly. We want to compile the model so it runs entirely inside a web browser. This means you could use Edu-Distill on a phone, tablet, or laptop just by visiting a URL.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Slide 19: Conclusion */}
+        {/* Slide 18: Conclusion */}
         <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start">
           <div className="max-w-4xl px-6 text-center">
             <div className="inline-block border border-pink-500/30 rounded-full px-6 py-2 bg-slate-950/80 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(236,72,153,0.2)]">
@@ -583,7 +564,7 @@ const App: React.FC = () => {
             <div className="flex flex-col items-center gap-8">
               <p className="text-white font-semibold">Thank you for listening.</p>
               <a
-                href="https://github.com/your-username/edu-distill"
+                href="https://github.com/nicogstar/Edu-Distill"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-slate-800 to-slate-900 rounded-full text-white font-semibold border border-slate-700 hover:border-white/50 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-all group"
@@ -596,7 +577,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide 20: Live Demo */}
+        {/* Slide 19: Live Demo */}
         <div className="h-screen w-full relative flex flex-col items-center justify-center snap-start bg-slate-950/50 backdrop-blur-sm overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
 
