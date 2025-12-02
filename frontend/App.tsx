@@ -732,15 +732,7 @@ const App: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Left Column */}
               <div className="space-y-4">
-                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
-                  <div className="flex items-start gap-3">
-                    <div className="text-3xl">🖼️</div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white mb-2">Multimodal Support</h3>
-                      <p className="text-sm text-slate-400">Enable grading of diagrams, charts, and handwritten work using vision models.</p>
-                    </div>
-                  </div>
-                </div>
+
 
                 <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
                   <div className="flex items-start gap-3">
@@ -765,15 +757,7 @@ const App: React.FC = () => {
 
               {/* Right Column */}
               <div className="space-y-4">
-                <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
-                  <div className="flex items-start gap-3">
-                    <div className="text-3xl">🔌</div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white mb-2">LMS Integration</h3>
-                      <p className="text-sm text-slate-400">Build plugins for Moodle, Canvas, and Blackboard for seamless adoption.</p>
-                    </div>
-                  </div>
-                </div>
+
 
                 <div className="glass-panel p-6 rounded-2xl text-left hover:border-emerald-500/50 transition-all">
                   <div className="flex items-start gap-3">
